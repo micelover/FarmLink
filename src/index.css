@@ -37,6 +37,16 @@
   }
 }
 
+/* Fix Leaflet + Tailwind preflight conflicts */
+.leaflet-container img {
+  max-width: none;
+  display: inline;
+}
+.leaflet-container * {
+  border-color: initial;
+  box-sizing: border-box;
+}
+
 @layer components {
   .hero-gradient {
     background: linear-gradient(

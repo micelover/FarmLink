@@ -36,7 +36,7 @@ export default function Index() {
                       Shop Now <ArrowRight className="w-4 h-4" />
                     </Button>
                   </Link>
-                  <Link to="/auth">
+                  <Link to="/account">
                     <Button size="lg" variant="outline" className="rounded-full px-8">
                       Start Selling
                     </Button>
