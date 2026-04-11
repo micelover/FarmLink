@@ -4,13 +4,13 @@ import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBrm6Q6dwBvEevqUgfJLJ7_s6bTEFHsj40",
-  authDomain: "farmlink-783ce.firebaseapp.com",
-  projectId: "farmlink-783ce",
-  storageBucket: "farmlink-783ce.firebasestorage.app",
-  messagingSenderId: "47602851353",
-  appId: "1:47602851353:web:e0160ad1aab2bc71fc1488",
-  measurementId: "G-FCF5M05SDH",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 export const app = initializeApp(firebaseConfig);
