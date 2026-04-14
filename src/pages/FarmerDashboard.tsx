@@ -4,7 +4,7 @@ import {
   Leaf, Package, DollarSign, ShoppingBag, TrendingUp,
   Plus, MapPin, FileText, Loader2, ArrowRight, LayoutDashboard,
 } from "lucide-react";
-import { collection, query, orderBy, limit, getDocs } from "firebase/firestore";
+import { collection, query, orderBy, where, getDocs } from "firebase/firestore";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { db, app } from "@/lib/firebase";
 import { useAuth } from "@/lib/AuthContext";
@@ -53,11 +53,16 @@ export default function FarmerDashboard() {
   // Fetch recent orders and filter for this farmer
   useEffect(() => {
     if (!user || !isFarmer) return;
-    const q = query(collection(db, "orders"), orderBy("createdAt", "desc"), limit(200));
+    const q = query(
+      collection(db, "orders"),
+      where("farmerIds", "array-contains", user.uid),
+      orderBy("createdAt", "desc")
+    );
     getDocs(q).then((snap) => {
-      const all = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Order, "id">) }));
-      const mine = all.filter((o) => o.items.some((i) => i.farmerId === user.uid));
-      setOrders(mine);
+      const docs = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Order, "id">) }));
+      setOrders(docs);
+    }).catch((err) => {
+      console.error("Orders query failed:", err);
     }).finally(() => setOrdersLoading(false));
   }, [user, isFarmer]);
 

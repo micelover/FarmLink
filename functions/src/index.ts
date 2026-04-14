@@ -119,6 +119,7 @@ export const recordOrder = onCall(
         buyerId: request.auth!.uid,
         paymentIntentId,
         items,
+        farmerIds: Object.keys(farmerEarnings),
         total,
         status: "paid",
         createdAt: new Date().toISOString(),

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Navigate } from "react-router-dom";
-import { Leaf, User, MapPin, FileText, Package, Plus, Home, DollarSign, Loader2, Building2, ChevronDown } from "lucide-react";
+import { Leaf, User, MapPin, FileText, Package, Plus, Home, DollarSign, Loader2, Building2, ChevronDown, ShoppingBag } from "lucide-react";
 
 interface NominatimResult {
   display_name: string;
@@ -16,7 +16,7 @@ interface NominatimResult {
   };
 }
 
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, collection, query, where, orderBy, getDocs } from "firebase/firestore";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { db, app } from "@/lib/firebase";
 import { useAuth } from "@/lib/AuthContext";
@@ -54,6 +54,12 @@ export default function Account() {
   const [error, setError] = useState("");
   const [showEditFarm, setShowEditFarm] = useState(false);
   const [showAddProduct, setShowAddProduct] = useState(false);
+
+  // Order history
+  interface OrderItem { productId: string; farmerId: string; farmName: string; name: string; price: number; quantity: number; unit: string; }
+  interface Order { id: string; buyerId: string; items: OrderItem[]; total: number; status: string; createdAt: string; }
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [ordersLoading, setOrdersLoading] = useState(true);
 
   // Street autocomplete
   const [streetConfirmed, setStreetConfirmed] = useState(false);
@@ -117,6 +123,19 @@ export default function Account() {
   const [payoutMsg, setPayoutMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const isFarmer = profile?.role === "farmer";
+
+  useEffect(() => {
+    if (!user) return;
+    const q = query(
+      collection(db, "orders"),
+      where("buyerId", "==", user.uid),
+      orderBy("createdAt", "desc")
+    );
+    getDocs(q)
+      .then((snap) => setOrders(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Order, "id">) }))))
+      .catch(() => {})
+      .finally(() => setOrdersLoading(false));
+  }, [user]);
 
   const handlePayout = async () => {
     setPayoutLoading(true);
@@ -498,6 +517,40 @@ export default function Account() {
             )}
           </div>
         )}
+
+        {/* Order History */}
+        <div className="bg-card border border-border rounded-2xl p-6 mb-6">
+          <h2 className="font-semibold text-foreground flex items-center gap-2 mb-4">
+            <ShoppingBag className="w-4 h-4 text-primary" /> Order History
+          </h2>
+          {ordersLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : orders.length === 0 ? (
+            <div className="text-center py-8">
+              <ShoppingBag className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
+              <p className="text-sm text-muted-foreground">No orders yet.</p>
+            </div>
+          ) : (
+            <div className="space-y-1">
+              {orders.map((order) => (
+                <div key={order.id} className="flex items-start justify-between py-3 border-b border-border last:border-0">
+                  <div>
+                    <p className="text-sm font-medium text-foreground">
+                      {order.items.map((i) => `${i.name} ×${i.quantity}`).join(", ")}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {new Date(order.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                      {" · "}{order.items.map((i) => i.farmName).filter((v, i, a) => a.indexOf(v) === i).join(", ")}
+                    </p>
+                  </div>
+                  <span className="text-sm font-semibold text-foreground shrink-0 ml-4">${order.total.toFixed(2)}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Become a farmer section */}
         {!isFarmer && (
