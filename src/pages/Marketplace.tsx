@@ -202,7 +202,7 @@ export default function Marketplace() {
     const matchesSearch =
       p.name.toLowerCase().includes(search.toLowerCase()) ||
       p.farmName.toLowerCase().includes(search.toLowerCase()) ||
-      p.description.toLowerCase().includes(search.toLowerCase());
+      (p.description ?? "").toLowerCase().includes(search.toLowerCase());
 
     let matchesDistance = true;
     if (distanceFilter !== "All" && userCoords && farmCoordsReady) {

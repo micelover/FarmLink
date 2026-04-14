@@ -332,7 +332,7 @@ export default function Account() {
           type="button"
           variant="ghost"
           className="rounded-full"
-          onClick={() => { setShowFarmerForm(false); setShowEditFarm(false); setError(""); }}
+          onClick={() => { setShowFarmerForm(false); setShowEditFarm(false); setError(""); setSaved(false); }}
         >
           Cancel
         </Button>

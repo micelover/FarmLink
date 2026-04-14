@@ -130,6 +130,8 @@ export default function AddressModal({ isOpen, onClose, onSave, required = false
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!address.trim()) { setError("Street address is required."); return; }
+    if (!city.trim()) { setError("City is required."); return; }
+    if (!state.trim()) { setError("State is required."); return; }
     if (!zipCode.trim()) { setError("Zip code is required."); return; }
     if (!user) return;
 
