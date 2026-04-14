@@ -27,7 +27,11 @@ export default function ProductDetail() {
     if (!id) return;
     getDoc(doc(db, "products", id)).then((snap) => {
       if (snap.exists()) {
-        setProduct({ id: snap.id, ...(snap.data() as Omit<FarmerProduct, "id">) });
+        const p = { id: snap.id, ...(snap.data() as Omit<FarmerProduct, "id">) };
+        setProduct(p);
+        const stored: FarmerProduct[] = JSON.parse(localStorage.getItem("recentlyViewedProducts") || "[]");
+        const updated = [p, ...stored.filter((x) => x.id !== p.id)].slice(0, 6);
+        localStorage.setItem("recentlyViewedProducts", JSON.stringify(updated));
       } else {
         setNotFound(true);
       }
@@ -131,7 +135,7 @@ export default function ProductDetail() {
                 </button>
                 <span className="text-base font-semibold w-6 text-center">{quantity}</span>
                 <button
-                  onClick={() => quantity > 0 ? updateQuantity(product.id, quantity + 1) : null}
+                  onClick={() => quantity > 0 ? updateQuantity(product.id, quantity + 1) : addItem(product)}
                   className="w-7 h-7 rounded-full bg-background border border-border flex items-center justify-center hover:bg-muted transition-colors"
                 >
                   <Plus className="w-3.5 h-3.5" />

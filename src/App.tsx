@@ -11,6 +11,7 @@ import Marketplace from "./pages/Marketplace";
 import ProductDetail from "./pages/ProductDetail";
 import FarmMap from "./pages/FarmMap";
 import FarmProfile from "./pages/FarmProfile";
+import FarmerDashboard from "./pages/FarmerDashboard";
 
 // Auth pages where we should NOT show the address gate
 const AUTH_ROUTES = ["/login", "/signup"];
@@ -51,6 +52,7 @@ export default function App() {
             <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/farms" element={<FarmMap />} />
           <Route path="/farm/:farmerId" element={<FarmProfile />} />
+          <Route path="/dashboard" element={<FarmerDashboard />} />
           </Routes>
         </BrowserRouter>
       </CartProvider>

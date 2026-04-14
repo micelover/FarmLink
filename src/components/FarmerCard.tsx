@@ -4,9 +4,10 @@ import type { Farmer } from "@/data/mockData";
 
 interface FarmerCardProps {
   farmer: Farmer;
+  onView?: () => void;
 }
 
-export default function FarmerCard({ farmer }: FarmerCardProps) {
+export default function FarmerCard({ farmer, onView }: FarmerCardProps) {
   return (
     <div className="bg-card rounded-2xl overflow-hidden border border-border card-shadow-hover p-6">
       <div className="flex items-start gap-4 mb-4">
@@ -40,7 +41,7 @@ export default function FarmerCard({ farmer }: FarmerCardProps) {
         </div>
       </div>
 
-      <Button variant="outline" className="w-full rounded-full text-sm">
+      <Button variant="outline" className="w-full rounded-full text-sm" onClick={onView}>
         View Farm
       </Button>
     </div>

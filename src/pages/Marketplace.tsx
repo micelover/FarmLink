@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { collection, onSnapshot, doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { Search, SlidersHorizontal, Package, ShoppingCart, MapPin, LocateFixed } from "lucide-react";
+import { Search, SlidersHorizontal, Package, ShoppingCart, MapPin, LocateFixed, Leaf } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -39,55 +39,59 @@ async function geocodeText(text: string): Promise<{ lat: number; lng: number } |
   return null;
 }
 
-function MarketProductCard({ product }: { product: FarmerProduct }) {
-  const [imgError, setImgError] = useState(false);
+function FarmCard({ farm }: {
+  farm: { farmName: string; farmerId: string; products: FarmerProduct[] };
+}) {
   const { addItem } = useCart();
 
   return (
-    <div className="group bg-card rounded-2xl overflow-hidden border border-border card-shadow-hover">
-      <Link to={`/product/${product.id}`}>
-        <div className="aspect-square overflow-hidden bg-muted flex items-center justify-center">
-          {product.imageUrl && !imgError ? (
-            <img
-              src={product.imageUrl}
-              alt={product.name}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              onError={() => setImgError(true)}
-            />
-          ) : (
-            <Package className="w-10 h-10 text-muted-foreground/30" />
-          )}
+    <div className="rounded-3xl overflow-hidden border border-border bg-card shadow-sm">
+      {/* Banner */}
+      <Link to={`/farm/${farm.farmerId}`} className="block relative h-44 overflow-hidden bg-muted flex items-center justify-center">
+        <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-muted">
+          <Leaf className="w-10 h-10 text-muted-foreground/30" />
         </div>
-        <div className="p-4 pb-2">
-          <Link
-            to={`/farm/${product.farmerId}`}
-            onClick={(e) => e.stopPropagation()}
-            className="text-xs text-muted-foreground hover:text-primary transition-colors mb-1 inline-block"
-          >
-            {product.farmName}
-          </Link>
-          <h3 className="font-semibold text-foreground text-sm leading-tight mb-1">
-            {product.name}
-          </h3>
-          {product.description && (
-            <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{product.description}</p>
-          )}
-          <span className="inline-block text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">
-            {product.category}
+        <div className="absolute bottom-0 left-0 right-0 px-5 pb-4 flex items-end justify-between">
+          <h2 className="text-xl font-bold text-foreground">{farm.farmName}</h2>
+          <span className="flex items-center gap-1 text-xs font-medium text-muted-foreground bg-background/80 backdrop-blur-sm px-3 py-1 rounded-full border border-border">
+            {farm.products.length} {farm.products.length === 1 ? "product" : "products"}
           </span>
         </div>
       </Link>
-      <div className="px-4 pb-4 pt-2 flex items-center justify-between">
-        <div>
-          <span className="font-bold text-foreground">${product.price.toFixed(2)}</span>
-          <span className="text-xs text-muted-foreground ml-1">/ {product.unit}</span>
+
+      {/* Products */}
+      <div className="p-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          {farm.products.map((p) => (
+            <div key={p.id} className="group bg-background rounded-2xl overflow-hidden border border-border hover:border-primary/40 transition-colors">
+              <Link to={`/product/${p.id}`}>
+                <div className="aspect-square overflow-hidden bg-muted flex items-center justify-center">
+                  {p.imageUrl ? (
+                    <img
+                      src={p.imageUrl}
+                      alt={p.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  ) : (
+                    <Package className="w-8 h-8 text-muted-foreground/30" />
+                  )}
+                </div>
+                <div className="px-3 pt-2 pb-1">
+                  <p className="text-xs font-semibold text-foreground leading-tight line-clamp-1">{p.name}</p>
+                </div>
+              </Link>
+              <div className="px-3 pb-3 flex items-center justify-between">
+                <span className="text-xs font-bold text-foreground">${p.price.toFixed(2)}<span className="text-muted-foreground font-normal"> /{p.unit}</span></span>
+                <button
+                  onClick={() => addItem(p)}
+                  className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors"
+                >
+                  <ShoppingCart className="w-3 h-3" />
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
-        <button
-          onClick={() => addItem(product)}
-          className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors"
-        >
-          <ShoppingCart className="w-3.5 h-3.5" />
-        </button>
       </div>
     </div>
   );
@@ -331,22 +335,31 @@ export default function Marketplace() {
           </div>
         )}
 
-        {/* Product grid */}
-        {!loading && !isDistanceLoading && filtered.length > 0 && (
-          <>
-            <p className="text-sm text-muted-foreground mb-4">
-              {filtered.length} {filtered.length === 1 ? "product" : "products"} found
-              {distanceFilter !== "All" && userCoords && (
-                <span className="ml-1">within {distanceFilter} miles</span>
-              )}
-            </p>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-              {filtered.map((p) => (
-                <MarketProductCard key={p.id} product={p} />
-              ))}
-            </div>
-          </>
-        )}
+        {/* Farm cards */}
+        {!loading && !isDistanceLoading && filtered.length > 0 && (() => {
+          const farmMap: Record<string, { farmName: string; farmerId: string; products: FarmerProduct[] }> = {};
+          for (const p of filtered) {
+            if (!farmMap[p.farmerId]) farmMap[p.farmerId] = { farmName: p.farmName, farmerId: p.farmerId, products: [] };
+            farmMap[p.farmerId].products.push(p);
+          }
+          const farms = Object.values(farmMap);
+          return (
+            <>
+              <p className="text-sm text-muted-foreground mb-6">
+                {farms.length} {farms.length === 1 ? "farm" : "farms"} · {filtered.length} {filtered.length === 1 ? "product" : "products"}
+                {distanceFilter !== "All" && userCoords && <span className="ml-1">within {distanceFilter} miles</span>}
+              </p>
+              <div className="space-y-6">
+                {farms.map((farm) => (
+                  <FarmCard
+                    key={farm.farmerId}
+                    farm={farm}
+                  />
+                ))}
+              </div>
+            </>
+          );
+        })()}
       </div>
 
       <Footer />

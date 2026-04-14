@@ -70,6 +70,9 @@ export default function FarmProfile() {
     getDoc(doc(db, "users", farmerId)).then((snap) => {
       if (snap.exists() && snap.data().role === "farmer") {
         setFarm(snap.data() as UserProfile);
+        const stored: string[] = JSON.parse(localStorage.getItem("recentlyViewedFarms") || "[]");
+        const updated = [farmerId, ...stored.filter((id) => id !== farmerId)].slice(0, 6);
+        localStorage.setItem("recentlyViewedFarms", JSON.stringify(updated));
       } else {
         setNotFound(true);
       }

@@ -54,14 +54,20 @@ async function geocode(query: string): Promise<{ lat: number; lng: number } | nu
 }
 
 async function geocodeFarm(farm: UserProfile): Promise<{ lat: number; lng: number } | null> {
-  // Try farmLocation first, then fall back to city+state from delivery address
+  // 1. Try full farm location (street address)
   if (farm.farmLocation) {
     const r = await geocode(farm.farmLocation);
     if (r) return r;
   }
+  // 2. Fall back to full street address from delivery address fields
+  if (farm.address) {
+    const full = [farm.address, farm.city, farm.state, farm.zipCode].filter(Boolean).join(", ");
+    const r = await geocode(full);
+    if (r) return r;
+  }
+  // 3. Last resort: city + state only
   if (farm.city || farm.state) {
-    const fallback = [farm.city, farm.state].filter(Boolean).join(", ");
-    const r = await geocode(fallback);
+    const r = await geocode([farm.city, farm.state].filter(Boolean).join(", "));
     if (r) return r;
   }
   return null;

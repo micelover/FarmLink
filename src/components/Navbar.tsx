@@ -70,7 +70,8 @@ export default function Navbar() {
             <nav className="hidden md:flex items-center gap-7">
               {navLink("/marketplace", "Marketplace")}
               {navLink("/farms", "Farm Map")}
-              {navLink("/account", "My Farm")}
+              {profile?.role === "farmer" && navLink("/dashboard", "Dashboard")}
+              {navLink("/account", profile?.role === "farmer" ? "My Farm" : "Account")}
             </nav>
 
             {/* Right side */}

@@ -2,13 +2,14 @@ import { useState } from "react";
 import { X, Minus, Plus, Trash2, ShoppingBag, Package } from "lucide-react";
 import { useCart } from "@/lib/CartContext";
 import { useAuth } from "@/lib/AuthContext";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import AddressModal from "@/components/AddressModal";
 import CheckoutModal from "@/components/CheckoutModal";
 
 export default function CartDrawer() {
   const { items, isOpen, setIsOpen, removeItem, updateQuantity, totalItems, totalPrice } = useCart();
-  const { profile } = useAuth();
+  const { user, profile } = useAuth();
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
 
@@ -130,19 +131,27 @@ export default function CartDrawer() {
               <span className="text-sm text-muted-foreground">Subtotal</span>
               <span className="font-bold text-foreground text-lg">${totalPrice.toFixed(2)}</span>
             </div>
-            <Button
-              className="w-full rounded-full h-11 text-sm font-semibold"
-              onClick={() => {
-                if (!profile?.address) {
-                  setShowAddressModal(true);
-                } else {
-                  setIsOpen(false);
-                  setShowCheckout(true);
-                }
-              }}
-            >
-              Checkout
-            </Button>
+            {!user ? (
+              <Link to="/login" onClick={() => setIsOpen(false)} className="block">
+                <Button className="w-full rounded-full h-11 text-sm font-semibold">
+                  Sign in to Checkout
+                </Button>
+              </Link>
+            ) : (
+              <Button
+                className="w-full rounded-full h-11 text-sm font-semibold"
+                onClick={() => {
+                  if (!profile?.address) {
+                    setShowAddressModal(true);
+                  } else {
+                    setIsOpen(false);
+                    setShowCheckout(true);
+                  }
+                }}
+              >
+                Checkout
+              </Button>
+            )}
             <button
               onClick={() => setIsOpen(false)}
               className="w-full text-center text-sm text-muted-foreground hover:text-foreground transition-colors"

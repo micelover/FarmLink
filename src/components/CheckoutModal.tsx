@@ -134,6 +134,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
   const [loading, setLoading] = useState(false);
   const [initError, setInitError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [successTotal, setSuccessTotal] = useState(0);
 
   // Fetch PaymentIntent client secret when modal opens
   useEffect(() => {
@@ -166,6 +167,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
   }, [isOpen, items]);
 
   const handleSuccess = () => {
+    setSuccessTotal(totalPrice);
     setSuccess(true);
     clearCart();
     setTimeout(onClose, 3500);
@@ -202,7 +204,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                 <CheckCircle2 className="w-12 h-12 text-primary" />
                 <h3 className="font-bold text-foreground text-lg">Order placed!</h3>
                 <p className="text-muted-foreground text-sm">
-                  Your order of ${totalPrice.toFixed(2)} was successful. The farmer will be notified.
+                  Your order of ${successTotal.toFixed(2)} was successful. The farmer will be notified.
                 </p>
               </div>
             )}

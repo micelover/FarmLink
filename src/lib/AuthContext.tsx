@@ -11,6 +11,9 @@ export interface UserProfile {
   role: "customer" | "farmer";
   farmName?: string;
   farmLocation?: string;
+  farmStreet?: string;
+  farmCity?: string;
+  farmState?: string;
   farmBio?: string;
   address?: string;
   city?: string;

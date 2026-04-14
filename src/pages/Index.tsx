@@ -1,14 +1,22 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Truck, Shield, Heart } from "lucide-react";
+import { ArrowRight, Truck, Shield, Heart, Package, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import ProductCard from "@/components/ProductCard";
-import FarmerCard from "@/components/FarmerCard";
-import { products, farmers } from "@/data/mockData";
+import { useCart } from "@/lib/CartContext";
+import type { FarmerProduct } from "@/types/farmerProduct";
 import heroProduce from "@/assets/hero-produce.jpg";
 
 export default function Index() {
+  const [recentProducts, setRecentProducts] = useState<FarmerProduct[]>([]);
+  const { addItem } = useCart();
+
+  useEffect(() => {
+    const stored: FarmerProduct[] = JSON.parse(localStorage.getItem("recentlyViewedProducts") || "[]");
+    setRecentProducts(stored);
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -82,57 +90,68 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Featured products */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-end justify-between mb-10">
-            <div>
-              <h2 className="text-3xl font-bold text-foreground">Fresh Picks</h2>
-              <p className="text-muted-foreground mt-1">Popular products from nearby farms</p>
-            </div>
-            <Link to="/marketplace" className="hidden md:flex items-center gap-1 text-sm font-medium text-primary hover:underline">
-              View all <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            {products.slice(0, 4).map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Featured farmers */}
+      {/* Recently viewed products */}
       <section className="py-20 bg-muted/40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-end justify-between mb-10">
             <div>
-              <h2 className="text-3xl font-bold text-foreground">Meet the Farmers</h2>
-              <p className="text-muted-foreground mt-1">The people behind your food</p>
+              <h2 className="text-3xl font-bold text-foreground">Recently Viewed</h2>
+              <p className="text-muted-foreground mt-1">Pick up where you left off</p>
             </div>
+            {recentProducts.length > 0 && (
+              <Link to="/marketplace" className="hidden md:flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+                Browse all <ArrowRight className="w-4 h-4" />
+              </Link>
+            )}
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {farmers.map((f) => (
-              <FarmerCard key={f.id} farmer={f} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground">
-            Ready to eat fresher?
-          </h2>
-          <p className="text-muted-foreground mt-3 max-w-md mx-auto">
-            Join thousands of customers supporting local farms and eating better.
-          </p>
-          <div className="mt-8 flex justify-center gap-3">
-            <Link to="/marketplace">
-              <Button size="lg" className="rounded-full px-8">Browse Marketplace</Button>
-            </Link>
-          </div>
+          {recentProducts.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+              {recentProducts.map((p) => (
+                <div key={p.id} className="group bg-card rounded-2xl overflow-hidden border border-border card-shadow-hover">
+                  <Link to={`/product/${p.id}`}>
+                    <div className="aspect-square overflow-hidden bg-muted flex items-center justify-center">
+                      {p.imageUrl ? (
+                        <img
+                          src={p.imageUrl}
+                          alt={p.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <Package className="w-10 h-10 text-muted-foreground/30" />
+                      )}
+                    </div>
+                    <div className="p-4 pb-2">
+                      <p className="text-xs text-muted-foreground mb-1">{p.farmName}</p>
+                      <h3 className="font-semibold text-foreground text-sm leading-tight mb-1">{p.name}</h3>
+                      <span className="inline-block text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                        {p.category}
+                      </span>
+                    </div>
+                  </Link>
+                  <div className="px-4 pb-4 pt-2 flex items-center justify-between">
+                    <div>
+                      <span className="font-bold text-foreground">${p.price.toFixed(2)}</span>
+                      <span className="text-xs text-muted-foreground ml-1">/ {p.unit}</span>
+                    </div>
+                    <button
+                      onClick={() => addItem(p)}
+                      className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors"
+                    >
+                      <ShoppingCart className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <p className="text-muted-foreground text-lg">No recently viewed products yet.</p>
+              <p className="text-muted-foreground text-sm mt-1">Browse the marketplace and products you view will appear here.</p>
+              <Link to="/marketplace" className="mt-6">
+                <Button variant="outline" className="rounded-full px-8">Browse Marketplace</Button>
+              </Link>
+            </div>
+          )}
         </div>
       </section>
 
