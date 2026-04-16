@@ -44,7 +44,7 @@ export default function Navbar() {
             <div className="flex items-center gap-3 shrink-0">
               <Link to="/" className="flex items-center gap-2">
                 <Leaf className="w-6 h-6 text-primary" />
-                <span className="font-bold text-xl text-foreground">FarmLink</span>
+                <span className="font-bold text-xl text-foreground">FarmHaul</span>
               </Link>
               {user && profile?.address && (
                 <button

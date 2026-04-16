@@ -56,13 +56,13 @@ export default function Signup() {
     <div className="min-h-screen bg-muted/30 flex flex-col items-center justify-center px-4 py-16">
       <Link to="/" className="flex items-center gap-2 mb-8">
         <Leaf className="w-7 h-7 text-primary" />
-        <span className="font-bold text-2xl text-foreground">FarmLink</span>
+        <span className="font-bold text-2xl text-foreground">FarmHaul</span>
       </Link>
 
       <div className="w-full max-w-md bg-card border border-border rounded-2xl p-8 shadow-sm">
         <h1 className="text-2xl font-bold text-foreground mb-1">Create an account</h1>
         <p className="text-sm text-muted-foreground mb-6">
-          Join FarmLink to buy fresh produce — or start selling from your farm anytime.
+          Join FarmHaul to buy fresh produce — or start selling from your farm anytime.
         </p>
 
         <Button

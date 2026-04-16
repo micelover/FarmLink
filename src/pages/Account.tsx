@@ -81,7 +81,7 @@ export default function Account() {
       try {
         const res = await fetch(
           `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(farmStreet)}&format=json&addressdetails=1&countrycodes=us&limit=6`,
-          { headers: { "Accept-Language": "en", "User-Agent": "FarmLink/1.0" } }
+          { headers: { "Accept-Language": "en", "User-Agent": "FarmHaul/1.0" } }
         );
         const data: NominatimResult[] = await res.json();
         const filtered = data.filter((d) => d.address.road && d.address.house_number);

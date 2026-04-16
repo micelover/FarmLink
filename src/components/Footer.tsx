@@ -9,7 +9,7 @@ export default function Footer() {
           <div className="col-span-1 md:col-span-2">
             <Link to="/" className="flex items-center gap-2 mb-4">
               <Leaf className="w-5 h-5 text-primary" />
-              <span className="font-bold text-lg text-foreground">FarmLink</span>
+              <span className="font-bold text-lg text-foreground">FarmHaul</span>
             </Link>
             <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
               Connecting local farmers with their communities. Fresh food, fair
@@ -51,7 +51,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-10 pt-6 border-t border-border text-center text-xs text-muted-foreground">
-          © {new Date().getFullYear()} FarmLink. All rights reserved.
+          © {new Date().getFullYear()} FarmHaul. All rights reserved.
         </div>
       </div>
     </footer>
